@@ -33,6 +33,7 @@ struct matchoptions
     {
         VS_ALL,
         VS_ALL_BUT_FIRST,
+        VS_ALL_NAMES,
         VS_FIRST,
         VS_NONE,
         VS_VLIST
@@ -181,6 +182,7 @@ static ERL_NIF_TERM a_global;
 static ERL_NIF_TERM a_offset;
 static ERL_NIF_TERM a_all;
 static ERL_NIF_TERM a_all_but_first;
+static ERL_NIF_TERM a_all_names;
 static ERL_NIF_TERM a_first;
 static ERL_NIF_TERM a_none;
 static ERL_NIF_TERM a_index;
@@ -219,6 +221,7 @@ static void init_atoms(ErlNifEnv* env)
     a_offset                     = enif_make_atom(env, "offset");
     a_all                        = enif_make_atom(env, "all");
     a_all_but_first              = enif_make_atom(env, "all_but_first");
+    a_all_names                  = enif_make_atom(env, "all_names");
     a_first                      = enif_make_atom(env, "first");
     a_none                       = enif_make_atom(env, "none");
     a_index                      = enif_make_atom(env, "index");
@@ -455,7 +458,7 @@ static void parse_match_capture_options(
     bool vs_set = false;
     if (enif_is_atom(env, tuple[1])) {
 
-        // ValueSpec = all | all_but_first | first | none
+        // ValueSpec = all | all_but_first | all_names | first | none
 
         if (enif_is_atom(env, tuple[1]) > 0) {
 
@@ -463,6 +466,8 @@ static void parse_match_capture_options(
                 opts.vs = matchoptions::VS_ALL;
             else if (enif_is_identical(tuple[1], a_all_but_first))
                 opts.vs = matchoptions::VS_ALL_BUT_FIRST;
+            else if (enif_is_identical(tuple[1], a_all_names))
+                opts.vs = matchoptions::VS_ALL_NAMES;
             else if (enif_is_identical(tuple[1], a_first))
                 opts.vs = matchoptions::VS_FIRST;
             else if (enif_is_identical(tuple[1], a_none))
@@ -497,7 +502,7 @@ static void parse_match_capture_options(
 // Option = caseless | {offset, non_neg_integer()}
 //          | {capture,ValueSpec} | {capture,ValueSpec,Type}
 // Type = index | binary
-// ValueSpec = all | all_but_first | first | none | ValueList
+// ValueSpec = all | all_but_first | all_names | first | none | ValueList
 // ValueList = [ ValueID ]
 // ValueID = int() | string() | atom()
 //
@@ -783,7 +788,7 @@ static ERL_NIF_TERM re2_match_impl(
                     return enif_make_tuple2(
                         env, a_match, enif_make_list1(env, first));
                 }
-            } else if (opts.vs == matchoptions::VS_ALL_BUT_FIRST) {
+            } else if (opts.vs == matchoptions::VS_ALL_BUT_FIRST || opts.vs == matchoptions::VS_ALL_NAMES) {
                 // skip first match
                 start = 1;
                 arrsz--;

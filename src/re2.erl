@@ -67,7 +67,7 @@ load_nif() ->
 -type match_option() :: 'caseless' | {'offset', non_neg_integer()}
                       | {'capture', value_spec()}
                       | {'capture', value_spec(), value_spec_type()}.
--type value_spec() :: 'all' | 'all_but_first' | 'first' | 'none'
+-type value_spec() :: 'all' | 'all_but_first' | 'all_names' | 'first' | 'none'
                     | [value_id()].
 -type value_spec_type() :: 'index' | 'binary'.
 -type value_id() :: non_neg_integer() | string() | atom().

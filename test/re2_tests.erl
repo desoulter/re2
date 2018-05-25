@@ -84,6 +84,10 @@ match_test(FunName) ->
                  re2:FunName(<<"hello">>, <<"(h)(.*)o">>,
                              [{capture,all_but_first,binary}])),
 
+    ?assertEqual({match,[{"id5",<<"mystring2">>}]},
+                 re2:FunName(<<"mystring2">>, <<"(?P<id4>\\Amystring1 ?\\z)|(?P<id5>\\Amystring2 ?\\z)|(?P<id6>\\Amystring3 ?\\z)">>,
+                             [{capture,all_names}])),
+
     ?assertEqual({match,[<<"hello">>,<<"h">>,<<"ell">>]},
                  re2:FunName(<<"hello">>, <<"(h)(.*)o">>,
                              [{capture,all,binary}])),

@@ -799,6 +799,25 @@ static ERL_NIF_TERM re2_match_impl(
                 // return matched subpatterns as specified in ValueList
 
                 return re2_match_ret_vlist(env, *re, s, opts, group, n);
+            } else if (opts.vs == matchoptions::VS_ALL_NAMES) {
+                const auto& nmap = re->CapturingGroupNames();
+                ERL_NIF_TERM result = enif_make_list(env, 0);
+
+                for (int i = start; i < n; i++) {
+                    ERL_NIF_TERM res = mres(env, s, group[i], opts.ct);
+                    if (enif_is_identical(res, a_err_enif_alloc_binary)) {
+                        return error(env, a_err_enif_alloc_binary);
+                    } else {
+                        if (!group[i].empty()) {
+                            result = enif_make_list_cell(env,
+                                enif_make_tuple2(env,
+                                    enif_make_string(env, nmap.at(i).c_str(), ERL_NIF_LATIN1),
+                                    res),
+                            result);
+                        }
+                    }
+                }
+                return enif_make_tuple2(env, a_match, result);
             } else {
 
                 // return all or all_but_first matches

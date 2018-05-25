@@ -809,9 +809,14 @@ static ERL_NIF_TERM re2_match_impl(
                         return error(env, a_err_enif_alloc_binary);
                     } else {
                         if (!group[i].empty()) {
+                            ErlNifBinary bgroup;
+                            if (!enif_alloc_binary(strlen(nmap.at(i).c_str()), &bgroup))
+                                return a_err_enif_alloc_binary;
+                            memcpy(bgroup.data, nmap.at(i).c_str(), strlen(nmap.at(i).c_str()));
+
                             result = enif_make_list_cell(env,
                                 enif_make_tuple2(env,
-                                    enif_make_string(env, nmap.at(i).c_str(), ERL_NIF_LATIN1),
+                                    enif_make_binary(env, &bgroup),
                                     res),
                             result);
                         }
